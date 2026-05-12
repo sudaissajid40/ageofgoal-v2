@@ -10,13 +10,20 @@ export function useUser() {
 
       const { data: profile, error: profileError } = await supabase
         .from('profiles')
-        .select('*')
+        .select('*, user_roles(role)')
         .eq('id', user.id)
         .single()
 
       if (profileError) throw profileError
       
-      return { ...user, profile }
+      // Flatten role for easier access
+      const userProfile = {
+        ...profile,
+        role: profile.user_roles?.[0]?.role || 'user'
+      }
+      
+      return { ...user, profile: userProfile }
+
     },
     staleTime: 1000 * 60 * 10, // Cache user data for 10 minutes
   })

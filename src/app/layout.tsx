@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Rajdhani, Orbitron } from "next/font/google";
 import "./globals.css";
 import QueryProvider from "@/components/providers/QueryProvider";
+import { MainLayout } from "@/components/layout/MainLayout";
 
 const rajdhani = Rajdhani({
   weight: ["400", "500", "600", "700"],
@@ -29,9 +30,12 @@ export default function RootLayout({
     <html lang="en" className={`${rajdhani.variable} ${orbitron.variable} dark`}>
       <body className="min-h-screen bg-[#0a0a0c] text-[#e1e1e3] font-sans selection:bg-orange-500/30">
         <QueryProvider>
-          {children}
+          <MainLayout>
+            {children}
+          </MainLayout>
         </QueryProvider>
       </body>
     </html>
   );
 }
+
