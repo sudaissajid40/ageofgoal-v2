@@ -14,7 +14,10 @@ export function useUser() {
         .eq('id', user.id)
         .single()
 
-      if (profileError) throw profileError
+      // Gracefully handle missing profiles without crashing the hook
+      if (profileError && profileError.code !== 'PGRST116') {
+        console.error('Profile fetch error:', profileError)
+      }
       
       // Flatten role for easier access
       const userProfile = {
