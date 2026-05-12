@@ -18,8 +18,10 @@ export function useUser() {
       
       // Flatten role for easier access
       const userProfile = {
-        ...profile,
-        role: profile.user_roles?.[0]?.role || 'user'
+        ...(profile || {}),
+        role: (profile?.user_roles && profile.user_roles.length > 0) 
+          ? profile.user_roles[0].role 
+          : 'user'
       }
       
       return { ...user, profile: userProfile }
