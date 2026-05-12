@@ -1,50 +1,96 @@
 @import "tailwindcss";
 
-@theme inline {
-  --color-primary: #f97316;
-  --color-secondary: #0ea5e9;
-  --color-accent: #8b5cf6;
-  --color-warning: #facc15;
-  --color-background: #0a0a0c;
-  --color-card: #121217;
-  --color-card-border: #27272a;
-  
-  --font-sans: var(--font-rajdhani);
-  --font-display: var(--font-orbitron);
+@plugin "tailwindcss-animate";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme {
+  --font-sans: "Rajdhani", "Inter", system-ui, sans-serif;
+  --font-display: "Orbitron", "Rajdhani", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+
+  --color-background: oklch(0.08 0.005 30);
+  --color-foreground: oklch(0.98 0.005 60);
+
+  --color-primary: oklch(0.72 0.21 45);
+  --color-primary-foreground: oklch(0.1 0 0);
+
+  --color-orange-500: oklch(0.72 0.21 45);
+  --color-blue-500: oklch(0.78 0.17 195);
+
+  --radius-lg: 0.625rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.5rem;
+  --radius-3xl: 2.5rem;
 }
 
-:root {
-  --primary: #f97316;
-  --secondary: #0ea5e9;
-  --background: 10 10 12;
-  --foreground: 225 225 227;
+@layer base {
+  :root {
+    --background: oklch(0.08 0.005 30);
+    --foreground: oklch(0.98 0.005 60);
+    --primary: oklch(0.72 0.21 45);
+    --border: oklch(0.2 0.01 30);
+  }
+
+  html, body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans);
+    background-image:
+      radial-gradient(ellipse at top, oklch(0.3 0.15 45 / 0.18), transparent 50%),
+      radial-gradient(circle at 20% 80%, oklch(0.25 0.1 30 / 0.15), transparent 40%);
+    background-attachment: fixed;
+    min-height: 100vh;
+  }
 }
 
-body {
-  @apply font-sans;
-}
+@layer utilities {
+  .bg-grid {
+    background-image:
+      linear-gradient(oklch(0.72 0.21 45 / 0.04) 1px, transparent 1px),
+      linear-gradient(90deg, oklch(0.72 0.21 45 / 0.04) 1px, transparent 1px);
+    background-size: 32px 32px;
+  }
 
-.gradient-text {
-  @apply bg-gradient-to-r from-orange-500 via-amber-400 to-orange-400 bg-clip-text text-transparent;
-}
+  .gradient-text {
+    background: linear-gradient(135deg, oklch(0.72 0.21 45), oklch(0.78 0.2 60));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
 
-.gradient-text-blue {
-  @apply bg-gradient-to-r from-blue-600 via-cyan-400 to-blue-400 bg-clip-text text-transparent;
-}
+  .gradient-text-blue {
+    background: linear-gradient(135deg, oklch(0.78 0.17 195), oklch(0.5 0.2 210));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
 
-.glass-card {
-  @apply border border-white/5 bg-white/5 backdrop-blur-lg;
-}
+  .glass-card {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+  }
 
-.card-glow {
-  @apply transition-all duration-300 hover:shadow-[0_0_40px_-10px_rgba(249,115,22,0.4)] hover:border-orange-500/30;
-}
+  .card-glow {
+    transition: all 0.3s ease;
+  }
 
-.card-glow-blue {
-  @apply transition-all duration-300 hover:shadow-[0_0_40px_-10px_rgba(37,99,235,0.4)] hover:border-blue-500/30;
-}
+  .card-glow:hover {
+    box-shadow: 0 0 24px -4px oklch(0.72 0.21 45 / 0.6);
+    border-color: oklch(0.72 0.21 45 / 0.3);
+  }
 
-.premium-border {
-  @apply relative rounded-xl p-[1px] before:absolute before:inset-0 before:rounded-xl before:bg-gradient-to-br before:from-white/20 before:via-transparent before:to-white/5 before:content-[''];
-}
+  .card-glow-blue:hover {
+    box-shadow: 0 0 24px -4px oklch(0.78 0.17 195 / 0.6);
+    border-color: oklch(0.78 0.17 195 / 0.3);
+  }
 
+  .text-glow {
+    text-shadow: 0 0 12px oklch(0.72 0.21 45 / 0.6);
+  }
+
+  .clip-tactical {
+    clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+  }
+}

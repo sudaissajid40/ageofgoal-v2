@@ -1,162 +1,211 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { 
   Trophy, 
-  Sword, 
-  Calendar, 
-  BarChart3, 
-  User, 
   Users, 
-  Info, 
-  LayoutDashboard,
-  LogIn,
-  Menu,
-  X
+  LayoutDashboard, 
+  User as UserIcon, 
+  Menu, 
+  X, 
+  LogOut, 
+  ShieldCheck,
+  Calendar,
+  Award,
+  Info,
+  ChevronRight
 } from 'lucide-react'
-import { useState } from 'react'
-import { cn } from '@/lib/utils'
 import { useUser } from '@/hooks/useUser'
-import { AdminBanner } from './AdminBanner'
+import { supabase } from '@/lib/supabase'
+import AdminBanner from './AdminBanner'
+import { cn } from '@/lib/utils'
 
-const navigation = [
+interface NavItem {
+  name: string
+  href: string
+  icon: any
+  requiresAuth?: boolean
+  adminOnly?: boolean
+}
+
+const NAVIGATION: NavItem[] = [
   { name: 'Home', href: '/', icon: LayoutDashboard },
-  { name: 'Series Tournaments', href: '/tournaments/series', icon: Trophy },
-  { name: 'Royal Tournaments', href: '/tournaments/royal', icon: Sword },
+  { name: 'Series', href: '/tournaments/series', icon: Trophy },
+  { name: 'Royal', href: '/tournaments/royal', icon: Trophy },
   { name: 'Schedule', href: '/schedule', icon: Calendar },
-  { name: 'Results', href: '/results', icon: BarChart3 },
+  { name: 'Results', href: '/results', icon: Award },
   { name: 'About', href: '/about', icon: Info },
 ]
 
-export function MainLayout({ children }: { children: React.ReactNode }) {
-  const [sidebarOpen, setSidebarOpen] = useState(false)
+const USER_NAV: NavItem[] = [
+  { name: 'Profile', href: '/profile', icon: UserIcon, requiresAuth: true },
+  { name: 'My Team', href: '/team', icon: Users, requiresAuth: true },
+]
+
+export default function MainLayout({ children }: { children: React.ReactNode }) {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const pathname = usePathname()
+  const router = useRouter()
   const { data: user, isLoading } = useUser()
 
-  return (
-    <div className="flex min-h-screen flex-col">
-      <AdminBanner />
-      
-      <div className="flex flex-1">
-        {/* Mobile Sidebar Overlay */}
-        {sidebarOpen && (
-          <div 
-            className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm lg:hidden"
-            onClick={() => setSidebarOpen(false)}
-          />
-        )}
+  useEffect(() => {
+    setIsSidebarOpen(false)
+  }, [pathname])
 
-        {/* Sidebar */}
-        <aside className={cn(
-          "fixed inset-y-0 left-0 z-50 w-64 transform bg-[#121217] border-r border-white/5 transition-transform duration-300 lg:relative lg:translate-x-0",
-          sidebarOpen ? "translate-x-0" : "-translate-x-full"
-        )}>
-          <div className="flex h-full flex-col">
-            <div className="flex h-20 items-center px-6">
-              <Link href="/" className="font-display text-2xl font-black uppercase tracking-tighter">
-                AOG <span className="text-orange-500">v2</span>
+  const handleLogout = async () => {
+    await supabase.auth.signOut()
+    router.push('/')
+    router.refresh()
+  }
+
+  const isAdmin = user?.role === 'admin'
+
+  return (
+    <div className="flex min-h-screen bg-grid">
+      {/* Mobile Backdrop */}
+      {isSidebarOpen && (
+        <div 
+          className="fixed inset-0 z-40 bg-background/80 backdrop-blur-sm lg:hidden"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
+
+      {/* Sidebar */}
+      <aside className={cn(
+        "fixed inset-y-0 left-0 z-50 w-72 transform border-r border-primary/20 bg-card/90 backdrop-blur-xl transition-all duration-300 lg:sticky lg:translate-x-0",
+        isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+      )}>
+        <div className="flex h-full flex-col">
+          {/* Logo - Restored from V1 */}
+          <div className="border-b border-white/5 px-6 py-6">
+            <Link href="/" className="flex items-center gap-3">
+              <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-xl border border-primary/30 bg-primary/5 p-1.5 shadow-lg shadow-primary/10">
+                <img 
+                  src="/icons/icon-192.png" 
+                  alt="AOG Logo" 
+                  className="h-full w-full object-contain"
+                />
+              </div>
+              <div className="flex flex-col">
+                <span className="font-display text-3xl font-black uppercase tracking-wider text-white leading-none">AOG</span>
+                <span className="font-display text-[10px] font-bold text-primary uppercase tracking-[0.2em] leading-none mt-1.5">Age of Goal</span>
+              </div>
+            </Link>
+            <p className="mt-3 font-mono text-[9px] uppercase tracking-[0.3em] text-muted-foreground/50">Competitive command center</p>
+          </div>
+
+          {/* Nav Links */}
+          <nav className="flex-1 space-y-1.5 px-4 py-8 overflow-y-auto custom-scrollbar">
+            {NAVIGATION.map((item) => (
+              <Link
+                key={item.name}
+                href={item.href}
+                className={cn(
+                  "group relative flex items-center gap-3 rounded-xl px-4 py-3.5 text-xs font-bold uppercase tracking-[0.15em] transition-all",
+                  pathname === item.href 
+                    ? "bg-primary/15 text-primary border-l-2 border-primary text-glow" 
+                    : "text-muted-foreground hover:bg-white/5 hover:text-white"
+                )}
+              >
+                <item.icon className={cn("h-4 w-4 transition-transform group-hover:scale-110", pathname === item.href ? "text-primary" : "text-muted-foreground")} />
+                {item.name}
+                {pathname === item.href && <div className="absolute right-4 h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />}
               </Link>
+            ))}
+
+            <div className="pt-6">
+              <div className="px-4 mb-3 text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground/30">Pro Zone</div>
+              {USER_NAV.map((item) => (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  className={cn(
+                    "group flex items-center gap-3 rounded-xl px-4 py-3.5 text-xs font-bold uppercase tracking-[0.15em] transition-all",
+                    pathname === item.href 
+                      ? "bg-primary/15 text-primary border-l-2 border-primary text-glow" 
+                      : "text-muted-foreground hover:bg-white/5 hover:text-white"
+                  )}
+                >
+                  <item.icon className="h-4 w-4" />
+                  {item.name}
+                </Link>
+              ))}
             </div>
 
-            <nav className="flex-1 space-y-1 px-3 py-4">
-              {navigation.map((item) => {
-                const isActive = pathname === item.href
-                return (
-                  <Link
-                    key={item.name}
-                    href={item.href}
-                    className={cn(
-                      "group flex items-center rounded-xl px-3 py-2.5 text-sm font-medium transition-all",
-                      isActive 
-                        ? "bg-orange-500/10 text-orange-500 shadow-[inset_0_0_10px_rgba(249,115,22,0.1)]" 
-                        : "text-muted-foreground hover:bg-white/5 hover:text-white"
-                    )}
-                    onClick={() => setSidebarOpen(false)}
-                  >
-                    <item.icon className={cn(
-                      "mr-3 h-5 w-5",
-                      isActive ? "text-orange-500" : "text-muted-foreground group-hover:text-white"
-                    )} />
-                    {item.name}
-                  </Link>
-                )
-              })}
-
-              <div className="my-4 h-px bg-white/5 mx-3" />
-              <p className="px-4 text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-2">Pro Zone</p>
-
-              {isLoading ? (
-                <div className="animate-pulse px-4 py-2 text-xs text-muted-foreground">Loading auth...</div>
-              ) : user ? (
-                <>
-                  <Link
-                    href="/profile"
-                    className={cn(
-                      "group flex items-center rounded-xl px-3 py-2.5 text-sm font-medium transition-all",
-                      pathname === '/profile' ? "bg-orange-500/10 text-orange-500" : "text-muted-foreground hover:bg-white/5 hover:text-white"
-                    )}
-                  >
-                    <User className="mr-3 h-5 w-5" />
-                    My Profile
-                  </Link>
-                  <Link
-                    href="/team"
-                    className={cn(
-                      "group flex items-center rounded-xl px-3 py-2.5 text-sm font-medium transition-all",
-                      pathname === '/team' ? "bg-orange-500/10 text-orange-500" : "text-muted-foreground hover:bg-white/5 hover:text-white"
-                    )}
-                  >
-                    <Users className="mr-3 h-5 w-5" />
-                    My Team
-                  </Link>
-                </>
-              ) : (
-                <Link
-                  href="/login"
-                  className="group flex items-center rounded-xl px-3 py-2.5 text-sm font-medium text-orange-500 bg-orange-500/5 hover:bg-orange-500/10 transition-all border border-orange-500/20"
-                >
-                  <LogIn className="mr-3 h-5 w-5" />
-                  Login for Glory
-                </Link>
-              )}
-            </nav>
-
-            {user?.profile?.role === 'admin' && (
-              <div className="p-4 border-t border-white/5">
+            {isAdmin && (
+              <div className="pt-6">
+                <div className="px-4 mb-3 text-[10px] font-black uppercase tracking-[0.3em] text-orange-500/40 font-display">Command</div>
                 <Link
                   href="/admin"
-                  className="flex items-center justify-center rounded-xl bg-white/5 py-3 text-xs font-bold uppercase tracking-widest text-white hover:bg-white/10 transition-all"
+                  className={cn(
+                    "group flex items-center gap-3 rounded-xl px-4 py-3.5 text-xs font-bold uppercase tracking-[0.15em] transition-all",
+                    pathname.startsWith('/admin') 
+                      ? "bg-orange-500/15 text-orange-500 border-l-2 border-orange-500" 
+                      : "text-muted-foreground hover:bg-white/5 hover:text-white"
+                  )}
                 >
+                  <ShieldCheck className="h-4 w-4" />
                   Admin Panel
                 </Link>
               </div>
             )}
+          </nav>
+
+          {/* User Footer */}
+          <div className="border-t border-white/5 p-4 space-y-3">
+            {user ? (
+              <>
+                <div className="flex items-center gap-3 rounded-2xl bg-white/5 border border-white/5 p-3">
+                  <div className="h-10 w-10 shrink-0 rounded-xl bg-primary/10 flex items-center justify-center text-primary font-bold uppercase">
+                    {user.email?.[0]}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-[10px] font-black uppercase tracking-widest text-white">{user.email?.split('@')[0]}</p>
+                    <p className="truncate text-[8px] font-mono uppercase text-muted-foreground tracking-tighter">Elite Operator</p>
+                  </div>
+                </div>
+                <button
+                  onClick={handleLogout}
+                  className="flex w-full items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 py-3 text-[10px] font-black uppercase tracking-[0.2em] text-white transition-all hover:bg-red-500/10 hover:border-red-500/30 hover:text-red-500"
+                >
+                  <LogOut className="h-4 w-4" /> Log Out
+                </button>
+              </>
+            ) : (
+              <Link
+                href="/login"
+                className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary py-4 text-xs font-black uppercase tracking-[0.2em] text-white shadow-xl shadow-primary/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
+              >
+                Launch App
+              </Link>
+            )}
           </div>
-        </aside>
-
-        {/* Content Area */}
-        <div className="flex flex-1 flex-col overflow-hidden">
-          {/* Top Navbar (Mobile only) */}
-          <header className="flex h-16 items-center justify-between px-6 border-b border-white/5 lg:hidden">
-            <Link href="/" className="font-display text-xl font-black uppercase tracking-tighter">
-              AOG <span className="text-orange-500">v2</span>
-            </Link>
-            <button 
-              onClick={() => setSidebarOpen(true)}
-              className="p-2 text-muted-foreground hover:text-white"
-              aria-label="Open Sidebar"
-            >
-              <Menu className="h-6 w-6" />
-            </button>
-          </header>
-
-          <main className="flex-1 overflow-y-auto bg-[#0a0a0c] p-6 md:p-8">
-            <div className="mx-auto max-w-7xl">
-              {children}
-            </div>
-          </main>
         </div>
+      </aside>
+
+      {/* Main Content */}
+      <div className="flex flex-1 flex-col">
+        {/* Header */}
+        <header className="sticky top-0 z-30 flex h-20 items-center justify-between border-b border-white/5 bg-background/50 px-6 backdrop-blur-md lg:hidden">
+          <Link href="/" className="flex items-center gap-2">
+            <img src="/icons/icon-192.png" alt="" className="h-8 w-8" />
+            <span className="font-display text-xl font-black uppercase tracking-wider">AOG</span>
+          </Link>
+          <button 
+            onClick={() => setIsSidebarOpen(true)}
+            className="rounded-lg border border-white/10 p-2 text-white"
+          >
+            <Menu className="h-6 w-6" />
+          </button>
+        </header>
+
+        <AdminBanner />
+
+        <main className="flex-1 p-6 md:p-10 lg:p-12">
+          {children}
+        </main>
       </div>
     </div>
   )
