@@ -49,11 +49,21 @@ export default function AdminVerificationsPage() {
         supabase.from('royal_registrations').select('*, tournament:royal_tournaments(name)').eq('payment_status', 'pending')
       ])
 
-      const combined = [
-        ...(series.data || []).map(r => ({ ...r, type: 'series' as const })),
-        ...(royal.data || []).map(r => ({ ...r, type: 'royal' as const }))
-      ]
+      const seriesData = (series.data || []).map(r => ({ 
+        ...r, 
+        type: 'series' as const,
+        display_name: (r as any).tournament?.name || 'Unknown Tournament',
+        participant_name: (r as any).team?.name || 'Unknown Team'
+      }))
 
+      const royalData = (royal.data || []).map(r => ({ 
+        ...r, 
+        type: 'royal' as const,
+        display_name: (r as any).tournament?.name || 'Unknown Arena',
+        participant_name: (r as any).team_name || 'Solo Player'
+      }))
+
+      const combined = [...seriesData, ...royalData]
       return combined.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
     },
     enabled: activeTab === 'payments'
@@ -164,7 +174,7 @@ export default function AdminVerificationsPage() {
               <div key={u.id} className="glass-card overflow-hidden rounded-[2rem] border border-white/5 transition-all hover:border-white/10">
                 <div className="flex flex-col md:flex-row items-start md:items-center p-6 gap-6">
                   <div className="h-16 w-16 flex items-center justify-center rounded-2xl bg-orange-500/10 text-orange-500 font-display text-2xl font-black">
-                    {u.username?.[0].toUpperCase()}
+                    {u.username ? u.username[0].toUpperCase() : 'U'}
                   </div>
                   <div className="flex-1 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                     <div>
@@ -225,12 +235,12 @@ export default function AdminVerificationsPage() {
                   <div className="flex-1 grid gap-4 sm:grid-cols-3">
                     <div>
                       <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1">Tournament</p>
-                      <p className="font-bold text-white">{p.tournament?.name}</p>
+                      <p className="font-bold text-white">{p.display_name}</p>
                       <span className="text-[8px] font-bold uppercase px-2 py-0.5 rounded bg-white/5 text-muted-foreground">{p.type}</span>
                     </div>
                     <div>
                       <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1">Participant</p>
-                      <p className="font-bold text-white">{p.type === 'series' ? p.team?.name : p.team_name}</p>
+                      <p className="font-bold text-white">{p.participant_name}</p>
                     </div>
                     <div>
                       <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1">Submitted</p>
