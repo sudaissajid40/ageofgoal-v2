@@ -51,7 +51,9 @@ export default function SeriesTournamentsPage() {
               {t.thumbnail_url && (
                 <div className="relative h-48 w-full overflow-hidden">
                   <img 
-                    src={t.thumbnail_url} 
+                    src={t.thumbnail_url.startsWith('http') 
+                      ? t.thumbnail_url 
+                      : `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/assets/${t.thumbnail_url}`} 
                     alt={t.name} 
                     className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" 
                   />
