@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Rajdhani, Orbitron } from "next/font/google";
 import "./globals.css";
 import QueryProvider from "@/components/providers/QueryProvider";
-import { MainLayout } from "@/components/layout/MainLayout";
+import MainLayout from "@/components/layout/MainLayout";
 
 const rajdhani = Rajdhani({
   weight: ["400", "500", "600", "700"],

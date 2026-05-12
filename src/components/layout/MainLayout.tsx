@@ -19,7 +19,7 @@ import {
 } from 'lucide-react'
 import { useUser } from '@/hooks/useUser'
 import { supabase } from '@/lib/supabase'
-import AdminBanner from './AdminBanner'
+import { AdminBanner } from './AdminBanner'
 import { cn } from '@/lib/utils'
 
 interface NavItem {
