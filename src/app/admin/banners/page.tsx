@@ -10,7 +10,8 @@ import {
   CheckCircle2, 
   ExternalLink,
   Trash2,
-  Bell
+  Bell,
+  Wand2
 } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
 import { cn } from '@/lib/utils'
@@ -153,8 +154,32 @@ export default function AdminBannersPage() {
                 </div>
               </div>
 
+              {/* Tactical AI Generator */}
+              <div className="rounded-2xl bg-orange-500/5 border border-orange-500/10 p-4 space-y-4">
+                <div className="flex items-center gap-2 text-orange-500 text-[10px] font-black uppercase tracking-widest">
+                  <Wand2 className="h-4 w-4" />
+                  Tactical AI Assistant
+                </div>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    placeholder="Describe the banner vibe..."
+                    className="flex-1 bg-black/40 rounded-xl border border-white/5 px-4 py-2 text-xs text-white focus:outline-none focus:border-orange-500/30"
+                  />
+                  <button 
+                    type="button"
+                    className="rounded-xl bg-orange-500/20 px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-orange-500 hover:bg-orange-500 hover:text-white transition-all"
+                  >
+                    Magic
+                  </button>
+                </div>
+                <p className="text-[9px] text-muted-foreground italic leading-tight">
+                  Our AI will generate a tactical background matching your tournament theme.
+                </p>
+              </div>
+
               <div>
-                <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground ml-1">Banner Image (Opt)</label>
+                <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground ml-1">Manual Asset Upload (Opt)</label>
                 <label className="mt-3 relative flex h-32 w-full cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-white/10 bg-white/5 transition-all hover:border-orange-500/30 hover:bg-white/[0.07]">
                   {file ? (
                     <div className="flex flex-col items-center gap-1">

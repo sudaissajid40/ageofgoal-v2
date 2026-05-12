@@ -93,6 +93,19 @@ function ProfileContent() {
 
   const profile = user.profile
   const status = profile?.verification_status
+  
+  // Cooldown Logic (3 days = 259200000 ms)
+  const COOLDOWN_PERIOD = 3 * 24 * 60 * 60 * 1000
+  const lastEdit = profile?.last_edit_at ? new Date(profile.last_edit_at).getTime() : 0
+  const cooldownRemaining = lastEdit + COOLDOWN_PERIOD - Date.now()
+  const isCooldownActive = cooldownRemaining > 0 && status !== 'rejected'
+
+  const formatCooldown = (ms: number) => {
+    const hours = Math.floor(ms / (1000 * 60 * 60))
+    const days = Math.floor(hours / 24)
+    if (days > 0) return `${days}d ${hours % 24}h remaining`
+    return `${hours}h remaining`
+  }
 
   return (
     <div className="max-w-4xl mx-auto space-y-8 pb-20">
@@ -104,20 +117,32 @@ function ProfileContent() {
           <p className="mt-2 text-muted-foreground">Complete your profile to unlock teams and tournaments.</p>
         </div>
 
-        {/* Verification Status Badge */}
-        <div className={cn(
-          "flex items-center gap-3 rounded-2xl border px-6 py-3",
-          status === 'approved' ? "bg-green-500/10 border-green-500/20 text-green-500" :
-          status === 'rejected' ? "bg-red-500/10 border-red-500/20 text-red-500" :
-          "bg-yellow-500/10 border-yellow-500/20 text-yellow-500"
-        )}>
-          {status === 'approved' ? <ShieldCheck className="h-5 w-5" /> : 
-           status === 'rejected' ? <ShieldAlert className="h-5 w-5" /> : 
-           <Clock className="h-5 w-5" />}
-          <div className="text-left">
-            <p className="text-[10px] font-black uppercase tracking-widest leading-none">Status</p>
-            <p className="text-sm font-bold uppercase">{status || 'Not Started'}</p>
+        {/* Verification & Cooldown Status */}
+        <div className="flex flex-wrap gap-4">
+          <div className={cn(
+            "flex items-center gap-3 rounded-2xl border px-6 py-3",
+            status === 'approved' ? "bg-green-500/10 border-green-500/20 text-green-500" :
+            status === 'rejected' ? "bg-red-500/10 border-red-500/20 text-red-500" :
+            "bg-yellow-500/10 border-yellow-500/20 text-yellow-500"
+          )}>
+            {status === 'approved' ? <ShieldCheck className="h-5 w-5" /> : 
+             status === 'rejected' ? <ShieldAlert className="h-5 w-5" /> : 
+             <Clock className="h-5 w-5" />}
+            <div className="text-left">
+              <p className="text-[10px] font-black uppercase tracking-widest leading-none">Status</p>
+              <p className="text-sm font-bold uppercase">{status || 'Not Started'}</p>
+            </div>
           </div>
+
+          {isCooldownActive && (
+            <div className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-6 py-3 text-muted-foreground">
+              <Clock className="h-5 w-5 text-orange-500" />
+              <div className="text-left">
+                <p className="text-[10px] font-black uppercase tracking-widest leading-none">Cooldown</p>
+                <p className="text-sm font-bold uppercase">{formatCooldown(cooldownRemaining)}</p>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
@@ -258,10 +283,20 @@ function ProfileContent() {
 
           <button
             type="submit"
-            disabled={isLoading}
-            className="w-full md:w-80 flex items-center justify-center rounded-2xl bg-orange-500 py-5 font-display text-xl font-black uppercase tracking-widest text-white shadow-2xl shadow-orange-500/30 transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50"
+            disabled={isLoading || isCooldownActive}
+            className={cn(
+              "w-full md:w-80 flex items-center justify-center rounded-2xl py-5 font-display text-xl font-black uppercase tracking-widest text-white shadow-2xl transition-all",
+              isCooldownActive 
+                ? "bg-white/5 border border-white/10 text-muted-foreground cursor-not-allowed" 
+                : "bg-orange-500 shadow-orange-500/30 hover:scale-[1.02] active:scale-[0.98]"
+            )}
           >
-            {isLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : (
+            {isLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : isCooldownActive ? (
+              <span className="flex items-center gap-3">
+                <Clock className="h-6 w-6" />
+                Locked
+              </span>
+            ) : (
               <span className="flex items-center gap-3">
                 <Save className="h-6 w-6" />
                 Commit Identity

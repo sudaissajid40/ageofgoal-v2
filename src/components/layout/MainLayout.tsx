@@ -44,7 +44,12 @@ const USER_NAV: NavItem[] = [
   { name: 'My Team', href: '/team', icon: Users, requiresAuth: true },
 ]
 
+import { registerServiceWorker } from '@/lib/push'
+
 export default function MainLayout({ children }: { children: React.ReactNode }) {
+  useEffect(() => {
+    registerServiceWorker()
+  }, [])
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const pathname = usePathname()
   const router = useRouter()
