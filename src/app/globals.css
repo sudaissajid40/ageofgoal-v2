@@ -1,0 +1,41 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-primary: #f97316;
+  --color-secondary: #0ea5e9;
+  --color-accent: #8b5cf6;
+  --color-warning: #facc15;
+  --color-background: #0a0a0c;
+  --color-card: #121217;
+  --color-card-border: #27272a;
+  
+  --font-sans: var(--font-rajdhani);
+  --font-display: var(--font-orbitron);
+}
+
+:root {
+  --primary: #f97316;
+  --secondary: #0ea5e9;
+  --background: 10 10 12;
+  --foreground: 225 225 227;
+}
+
+body {
+  @apply font-sans;
+}
+
+.gradient-text {
+  @apply bg-gradient-to-r from-orange-500 via-amber-400 to-orange-400 bg-clip-text text-transparent;
+}
+
+.glass-card {
+  @apply border border-white/5 bg-white/5 backdrop-blur-lg;
+}
+
+.card-glow {
+  @apply shadow-[0_0_20px_-12px_rgba(249,115,22,0.3)] transition-all duration-300 hover:shadow-[0_0_30px_-10px_rgba(249,115,22,0.5)];
+}
+
+.premium-border {
+  @apply relative rounded-xl p-[1px] before:absolute before:inset-0 before:rounded-xl before:bg-gradient-to-br before:from-white/20 before:via-transparent before:to-white/5 before:content-[''];
+}
