@@ -3,7 +3,7 @@
 import { useState, Suspense } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { LogIn, Mail, Lock, Loader2, AlertCircle } from 'lucide-react'
+import { LogIn, Mail, Lock, Loader2, AlertCircle, ArrowRight } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 function LoginContent() {
@@ -64,35 +64,40 @@ function LoginContent() {
           </p>
         </div>
 
-        <form className="mt-8 space-y-6" onSubmit={handleAuth}>
+        <form onSubmit={handleAuth} className="space-y-6">
           {error && (
             <div className="flex items-center gap-3 rounded-2xl bg-red-500/10 border border-red-500/20 p-4 text-xs font-medium text-red-500">
               <AlertCircle className="h-4 w-4" />
               {error}
             </div>
           )}
-
-          <div className="space-y-4">
+          
+          <div className="space-y-2">
+            <label className="text-xs font-black uppercase tracking-widest text-muted-foreground ml-1">Email Command</label>
             <div className="relative">
-              <Mail className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
+              <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-primary/40" />
               <input
                 type="email"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full rounded-2xl border border-white/5 bg-white/5 py-4 pl-12 pr-4 text-sm text-white transition-all focus:border-orange-500/50 focus:bg-white/10 focus:outline-none"
-                placeholder="Email Address"
+                className="w-full rounded-xl border border-white/5 bg-white/5 py-4 pl-12 pr-4 text-sm focus:border-primary/50 focus:ring-1 focus:ring-primary/50 outline-none transition-all"
+                placeholder="operator@aog.com"
               />
             </div>
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-xs font-black uppercase tracking-widest text-muted-foreground ml-1">Access Key</label>
             <div className="relative">
-              <Lock className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
+              <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-primary/40" />
               <input
                 type="password"
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full rounded-2xl border border-white/5 bg-white/5 py-4 pl-12 pr-4 text-sm text-white transition-all focus:border-orange-500/50 focus:bg-white/10 focus:outline-none"
-                placeholder="Password"
+                className="w-full rounded-xl border border-white/5 bg-white/5 py-4 pl-12 pr-4 text-sm focus:border-primary/50 focus:ring-1 focus:ring-primary/50 outline-none transition-all"
+                placeholder="••••••••"
               />
             </div>
           </div>
@@ -100,13 +105,16 @@ function LoginContent() {
           <button
             type="submit"
             disabled={isLoading}
-            className="flex w-full items-center justify-center rounded-2xl bg-orange-500 py-4 font-display text-lg font-black uppercase tracking-widest text-white shadow-xl shadow-orange-500/20 transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:hover:scale-100"
+            className="group relative w-full overflow-hidden rounded-xl bg-orange-500 py-4 font-display text-lg font-black uppercase tracking-widest text-white shadow-2xl shadow-orange-500/20 transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50"
           >
-            {isLoading ? (
-              <Loader2 className="h-6 w-6 animate-spin" />
-            ) : (
-              mode === 'login' ? 'Sign In' : 'Sign Up'
-            )}
+            <span className="relative z-10 flex items-center justify-center gap-2">
+              {isLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : (
+                <>
+                  {mode === 'login' ? 'Authorize Access' : 'Create Profile'}
+                  <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
+                </>
+              )}
+            </span>
           </button>
         </form>
 
