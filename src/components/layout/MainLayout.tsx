@@ -65,7 +65,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
     router.refresh()
   }
 
-  const isAdmin = user?.role === 'admin'
+  const isAdmin = user?.profile?.role === 'admin'
 
   return (
     <div className="flex min-h-screen bg-grid">
