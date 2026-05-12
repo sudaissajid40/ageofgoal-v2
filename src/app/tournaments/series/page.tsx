@@ -18,6 +18,8 @@ export default function SeriesTournamentsPage() {
       if (error) throw error
       return data
     },
+    staleTime: 0, // Always fetch fresh data
+    refetchOnWindowFocus: true
   })
 
   return (
